@@ -1,0 +1,82 @@
+<!doctype html>
+<head>
+	
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Lampies</title>
+<link rel="stylesheet" href="https://unpkg.com/purecss@0.6.2/build/pure-min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/12.1.0/nouislider.min.js"></script>
+<link rel="stylesheet" type="text/css" href="nouislider.css">
+</head>
+<body>
+<h1>LucLampjes</h1>
+<p>light state: <span id="lightstate">Polling</span></p>
+<button class="pure-button pure-button-primary" onclick='fetch("http://192.168.178.137/setstate?state=flow")'>flow</button>
+<button class="pure-button pure-button-primary" onclick='fetch("http://192.168.178.137/setstate?state=solid")'>solid</button>
+<button class="pure-button pure-button-primary" onclick='fetch("http://192.168.178.137/setstate?state=twinkle")'>twinkle</button>
+<button class="pure-button pure-button-primary" onclick='fetch("http://192.168.178.137/setstate?state=meteor")'>meteor</button>
+<button class="pure-button pure-button-primary" onclick='fetch("http://192.168.178.137/setstate?state=lines")'>lines</button>
+<button class="pure-button pure-button-primary" onclick='fetch("http://192.168.178.137/setstate?state=hue")'>hue</button>
+<button class="pure-button pure-button-primary" onclick='fetch("http://192.168.178.137/setstate?state=specific")'>specific</button>
+<button class="pure-button pure-button-primary" onclick='fetch("http://192.168.178.137/setstate?state=none")'>none</button>
+<button class="pure-button pure-button-primary" onclick='fetch("http://192.168.178.137/setstate?state=noise")'>noise</button>
+<input type="range" oninput="slider()" value=0 min=0 max=90 id="min">
+<input type="range" oninput="slider()" value=90 min=0 max=90 id="max">
+
+
+
+<input type="color" id="color" oninput="color()" value="#ff0000" style="width:85%;">
+
+	</body>
+<script>
+var lastdone = new Date();
+function slider(){
+
+min = document.getElementById("min").value;
+max = document.getElementById("max").value;
+if(min > max){
+	max, min = min, max;
+}
+
+if(new Date() - lastdone > 150){
+fetch('http://192.168.178.137/select?min=' + min + "&max=" + max);
+lastdone = new Date();
+}
+
+
+}
+
+function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+function getstate(){
+fetch('http://192.168.178.137/lstate')
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(response) {
+    console.log(response.state);
+    document.getElementById("lightstate").innerHTML = response.state;
+  });
+}
+getstate();
+//setInterval(getstate, 10000)
+
+function color(){
+hex = document.getElementById("color").value
+r = hexToRgb(hex).r
+g = hexToRgb(hex).g 
+b = hexToRgb(hex).b
+fetch(`http://192.168.178.137/setcolor?r=${r}&g=${g}&b=${b}`)
+
+}
+
+
+
+</script>
